@@ -9,3 +9,6 @@ Thumbs.db
 # Temp
 *.tmp
 *.bak
+
+# Секреты и инструкции — ТОЛЬКО локально
+DEEPAGENT_PUBLISHING_GUIDE*
