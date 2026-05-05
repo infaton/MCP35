@@ -1,0 +1,22 @@
+{
+  "name": "INFATON MCP35",
+  "description": "MCP server for 1C:Enterprise ERP with 35 tools: metadata inspection, document CRUD, register queries, and BSL integration. First MCP server for Russian ERP systems (300,000+ organizations). JSON-RPC 2.0 compliant BSL implementation.",
+  "categories": ["ERP Systems", "Databases"],
+  "tools": 35,
+  "transport": ["stdio"],
+  "runtime": "node",
+  "environmentVariables": {
+    "ONEC_URL": {
+      "description": "Base URL of the 1C:Enterprise MCP HTTP service endpoint",
+      "required": false
+    },
+    "ONEC_USER": {
+      "description": "1C:Enterprise username for authentication",
+      "required": false
+    },
+    "ONEC_PASSWORD": {
+      "description": "1C:Enterprise password for authentication",
+      "required": false
+    }
+  }
+}
