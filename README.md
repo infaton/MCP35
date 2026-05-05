@@ -1,5 +1,8 @@
 # INFATON MCP Server для 1С:Предприятие
 
+[![MCP35 MCP server](https://glama.ai/mcp/servers/infaton/MCP35/badges/card.svg)](https://glama.ai/mcp/servers/infaton/MCP35)
+
+
 **Model Context Protocol (MCP)** — сервер на стороне 1С:Предприятие, предоставляющий **35 инструментов** для взаимодействия AI-ассистентов с базой данных 1С.
 
 Протокол: **JSON-RPC 2.0** (спецификация [MCP](https://modelcontextprotocol.io/))
