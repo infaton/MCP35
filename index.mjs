@@ -208,6 +208,37 @@ const TOOLS = [
     name: 'import_data',
     description: 'Массовый импорт данных из JSON-массива. Создаёт или обновляет объекты.',
     inputSchema: { type: 'object', properties: { full_name: str('Тип объекта для импорта, например: Справочник.Номенклатура'), data: { type: 'array', description: 'Массив JSON-объектов с данными для импорта', items: { type: 'object' } }, mode: str('Режим: create (по умолчанию), upsert, update') }, required: ['full_name', 'data'] }
+  },
+  // Group H: New tools v2.0 (6)
+  {
+    name: 'fill_on_basis',
+    description: 'Создать новый документ/справочник на основании существующего объекта. Вызывает типовой механизм ЗаполнитьНаОсновании(). Ключевой для цепочек: ЗаказКлиента → Реализация → СчётФактура.',
+    inputSchema: { type: 'object', properties: { target_type: str('Полное имя целевого объекта, например: Документ.РеализацияТоваровУслуг'), base_type: str('Полное имя объекта-основания, например: Документ.ЗаказКлиента'), base_guid: str('UUID объекта-основания'), attributes: { type: 'object', description: 'Дополнительные реквизиты для переопределения (необязательно)' } }, required: ['target_type', 'base_type', 'base_guid'] }
+  },
+  {
+    name: 'write_register_records',
+    description: 'Записать данные в регистр сведений напрямую. Поддерживает периодические и непериодические регистры. Для контактной информации, курсов валют, цен, штрихкодов.',
+    inputSchema: { type: 'object', properties: { full_name: str('Полное имя регистра, например: РегистрСведений.КурсыВалют'), records: { type: 'array', description: 'Массив записей. Каждая запись — объект с измерениями, ресурсами и реквизитами', items: { type: 'object' } }, replace: { type: 'boolean', description: 'Режим замены: true — заменить по ключу, false — добавить (по умолчанию)' }, period: str('Период для периодических регистров (YYYYMMDD или ISO 8601)') }, required: ['full_name', 'records'] }
+  },
+  {
+    name: 'update_tabular_section',
+    description: 'Обновить табличную часть существующего объекта (документа/справочника). Три режима: replace (полная замена), append (добавление), update_by_index (по номеру строки).',
+    inputSchema: { type: 'object', properties: { full_name: str('Полное имя объекта, например: Документ.ЗаказКлиента'), guid: str('UUID объекта'), tabular_section: str('Имя табличной части, например: Товары'), rows: { type: 'array', description: 'Массив строк ТЧ', items: { type: 'object' } }, mode: str('Режим: replace (по умолчанию), append, update_by_index') }, required: ['full_name', 'guid', 'tabular_section', 'rows'] }
+  },
+  {
+    name: 'subscribe_events',
+    description: 'Получить события (изменения) из журнала регистрации 1С с момента указанной метки. Polling-based CDC для синхронизации двойников. Возвращает watermark для следующего запроса.',
+    inputSchema: { type: 'object', properties: { full_name: str('Фильтр по типу объекта (необязательно)'), event_types: str('Типы событий через запятую (необязательно)'), since: str('Метка времени ISO 8601 (по умолчанию 5 мин назад)'), max_events: { type: 'integer', description: 'Макс. кол-во событий (по умолчанию 100, макс. 1000)' } }, required: [] }
+  },
+  {
+    name: 'execute_batch',
+    description: 'Выполнить пакет операций за один HTTP-вызов. Поддерживает любые инструменты MCP. Режимы: последовательный, stop-on-error, транзакционный (атомарный). Макс. 50 операций.',
+    inputSchema: { type: 'object', properties: { operations: { type: 'array', description: 'Массив операций: [{tool: "имя", arguments: {...}}, ...]', items: { type: 'object' } }, stop_on_error: { type: 'boolean', description: 'Остановить при ошибке (по умолчанию true)' }, transactional: { type: 'boolean', description: 'Атомарная транзакция — откат всех при ошибке (по умолчанию false)' } }, required: ['operations'] }
+  },
+  {
+    name: 'get_changes_since',
+    description: 'Получить список объектов, изменённых после указанной метки. Change Data Capture для синхронизации двойников. Возвращает GUID, тип изменения, время, watermark.',
+    inputSchema: { type: 'object', properties: { full_name: str('Полное имя типа объекта, например: Документ.ЗаказКлиента'), since: str('Метка времени ISO 8601'), include_data: { type: 'boolean', description: 'Включить полные данные объектов (по умолчанию false)' }, max_results: { type: 'integer', description: 'Макс. результатов (по умолчанию 500, макс. 5000)' } }, required: ['full_name', 'since'] }
   }
 ];
 
@@ -222,7 +253,7 @@ async function handleRequest(msg) {
       result: {
         protocolVersion: '2024-11-05',
         capabilities: { tools: {} },
-        serverInfo: { name: 'infaton-1c-mcp', version: '1.0.0' }
+        serverInfo: { name: 'infaton-1c-mcp', version: '2.0.0' }
       }
     };
   }
