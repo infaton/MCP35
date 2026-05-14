@@ -20,7 +20,7 @@ const ONEC_URL = process.env.ONEC_URL || '';
 const ONEC_USER = process.env.ONEC_USER || '';
 const ONEC_PASSWORD = process.env.ONEC_PASSWORD || '';
 
-// ─── 35 tool definitions ────────────────────────────────────────────────
+// ─── 51 tool definitions ────────────────────────────────────────────────
 
 function str(description) {
   return { type: 'string', description };
@@ -239,6 +239,58 @@ const TOOLS = [
     name: 'get_changes_since',
     description: 'Получить список объектов, изменённых после указанной метки. Change Data Capture для синхронизации двойников. Возвращает GUID, тип изменения, время, watermark.',
     inputSchema: { type: 'object', properties: { full_name: str('Полное имя типа объекта, например: Документ.ЗаказКлиента'), since: str('Метка времени ISO 8601'), include_data: { type: 'boolean', description: 'Включить полные данные объектов (по умолчанию false)' }, max_results: { type: 'integer', description: 'Макс. результатов (по умолчанию 500, макс. 5000)' } }, required: ['full_name', 'since'] }
+  },
+
+  // Group H: New tools v2.1 (10)
+  {
+    name: 'get_balance',
+    description: 'Получить остатки и/или обороты регистра бухгалтерии. Работает с любым планом счетов. Поддерживает фильтрацию по счёту, периоду, организации и субконто.',
+    inputSchema: { type: 'object', properties: { register_name: str('Имя регистра бухгалтерии (по умолчанию Хозрасчетный)'), account_code: str('Код счёта (например: 41.01, 60.01)'), period_from: str('Начало периода ISO 8601'), period_to: str('Конец периода ISO 8601'), dimensions: { type: 'object', description: 'Отбор по измерениям/субконто: {ИмяИзмерения: Значение}' }, balance_type: str('Тип: balance (остатки), turnovers (обороты), balance_and_turnovers. По умолчанию balance') }, required: ['account_code'] }
+  },
+  {
+    name: 'get_register_totals',
+    description: 'Получить итоги регистра накопления (остатки, обороты или и то и другое). Поддерживает отбор по измерениям и выбор ресурсов.',
+    inputSchema: { type: 'object', properties: { full_name: str('Полное имя регистра накопления (например: РегистрНакопления.ТоварыНаСкладах)'), period_from: str('Начало периода ISO 8601'), period_to: str('Конец периода ISO 8601'), dimensions: { type: 'object', description: 'Отбор по измерениям' }, resources: str('Ресурсы через запятую (пусто = все)'), balance_type: str('Тип: balance, turnovers, balance_and_turnovers') }, required: ['full_name'] }
+  },
+  {
+    name: 'get_accounting_entries',
+    description: 'Получить бухгалтерские проводки (движения) документа. Возвращает: счёт Дт, счёт Кт, сумма, количество, субконто, содержание.',
+    inputSchema: { type: 'object', properties: { document_ref: str('Ссылка на документ (GUID)'), register_name: str('Имя регистра бухгалтерии (по умолчанию Хозрасчетный)') }, required: ['document_ref'] }
+  },
+  {
+    name: 'get_related_documents',
+    description: 'Найти документы, связанные с указанным через цепочки «Ввод на основании». Показывает: тип, номер, дата, направление, глубину.',
+    inputSchema: { type: 'object', properties: { document_ref: str('Ссылка на документ (GUID)'), direction: str('Направление: forward, backward, both (по умолчанию both)'), max_depth: { type: 'integer', description: 'Глубина поиска (1–5, по умолчанию 1)' } }, required: ['document_ref'] }
+  },
+  {
+    name: 'validate_document',
+    description: 'Проверить корректность заполнения документа без проведения. Вызывает стандартную процедуру проверки. Возвращает список ошибок или подтверждение.',
+    inputSchema: { type: 'object', properties: { document_ref: str('Ссылка на документ (GUID)') }, required: ['document_ref'] }
+  },
+  {
+    name: 'get_form_structure',
+    description: 'Получить структуру управляемой формы: реквизиты, команды, элементы. Полезно для понимания пользовательского интерфейса объекта.',
+    inputSchema: { type: 'object', properties: { full_name: str('Полное имя объекта (например: Документ.РеализацияТоваровУслуг)'), form_name: str('Имя формы (если пусто — основная форма)') }, required: ['full_name'] }
+  },
+  {
+    name: 'get_rights',
+    description: 'Получить права доступа текущего пользователя к объекту метаданных. Возвращает: чтение, добавление, изменение, удаление, проведение и др.',
+    inputSchema: { type: 'object', properties: { full_name: str('Полное имя объекта (например: Документ.ЗаказКлиента)') }, required: ['full_name'] }
+  },
+  {
+    name: 'find_duplicates',
+    description: 'Найти потенциальные дубли в справочнике по указанным реквизитам. Точное и нечёткое сравнение. Возвращает пары с процентом совпадения.',
+    inputSchema: { type: 'object', properties: { full_name: str('Полное имя справочника (например: Справочник.Контрагенты)'), attributes: str('Реквизиты для сравнения через запятую (например: ИНН,Наименование)'), threshold: { type: 'integer', description: 'Порог совпадения 0–100 (по умолчанию 90)' }, max_results: { type: 'integer', description: 'Макс. пар дублей (по умолчанию 100)' } }, required: ['full_name', 'attributes'] }
+  },
+  {
+    name: 'get_print_form',
+    description: 'Получить печатную форму документа через УправлениеПечатью. Без print_form_id — список доступных форм. С ним — генерация формы.',
+    inputSchema: { type: 'object', properties: { document_ref: str('Ссылка на документ (GUID)'), print_form_id: str('Идентификатор печатной формы (если пусто — список доступных)'), format: str('Формат: info (описание), mxl_text (текст). По умолчанию info') }, required: ['document_ref'] }
+  },
+  {
+    name: 'get_configuration_extensions',
+    description: 'Получить список расширений конфигурации (CFE). Возвращает: имя, синоним, версия, назначение, активность, безопасный режим.',
+    inputSchema: { type: 'object', properties: { active_only: { type: 'boolean', description: 'Только активные расширения (по умолчанию true)' } }, required: [] }
   }
 ];
 
@@ -253,7 +305,7 @@ async function handleRequest(msg) {
       result: {
         protocolVersion: '2024-11-05',
         capabilities: { tools: {} },
-        serverInfo: { name: 'infaton-1c-mcp', version: '2.0.0' }
+        serverInfo: { name: 'infaton-1c-mcp', version: '2.1.0' }
       }
     };
   }
