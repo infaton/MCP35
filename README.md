@@ -270,3 +270,11 @@ MIT © 2024-2026 [INFATON](https://infaton.ru) — Привалов С.Ю.
 ---
 
 *Подробная инструкция по сборке `.cfe` — см. [HOW_TO_BUILD_CFE.md](HOW_TO_BUILD_CFE.md)*
+
+---
+
+## 📰 Публикация на Инфостарт
+
+[![Infostart](https://infostart.ru/bitrix/templates/sandbox_empty/assets/tpl/abo/img/logo.svg)](https://infostart.ru/1c/articles/2712602/)
+
+Статья на портале **Инфостарт**: [INFATON MCP Server v2.1 — 51 инструмент для AI-интеграции с 1С:Предприятие](https://infostart.ru/1c/articles/2712602/)
