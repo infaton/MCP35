@@ -1,17 +1,26 @@
 #!/usr/bin/env node
 /**
  * INFATON MCP35 — stdio MCP server (proxy to 1C:Enterprise HTTP service)
- * 
+ *
  * This Node.js wrapper implements the MCP stdio transport (JSON-RPC 2.0 over stdin/stdout).
  * It proxies all tool calls to a running 1C:Enterprise HTTP service.
- * 
+ *
  * Environment variables:
- *   ONEC_URL      — Base URL of the 1C HTTP service, e.g. http://server/base/hs/mcp
- *   ONEC_USER     — 1C username (optional)
- *   ONEC_PASSWORD  — 1C password (optional)
- * 
+ *   ONEC_URL           — Base URL of the 1C HTTP service, e.g. https://server/base/hs/mcp
+ *   ONEC_USER          — 1C username (optional)
+ *   ONEC_PASSWORD      — 1C password (optional)
+ *   ONEC_ALLOWED_TOOLS — Comma-separated whitelist of tool names (optional).
+ *                        If set, only listed tools are exposed and callable.
+ *                        Example: "get_list,get_object_by_ref,execute_query"
+ *
  * Without ONEC_URL, the server responds to initialize and tools/list
  * but returns an error for tools/call (demo/inspection mode).
+ *
+ * Security notes:
+ *   - Always use HTTPS in production. HTTP transmits credentials in plaintext.
+ *   - Restrict the 1C user to minimum required rights (read-only where possible).
+ *   - Use ONEC_ALLOWED_TOOLS to block dangerous tools (execute_code, delete_object,
+ *     run_scheduled_job) in environments where they are not needed.
  */
 
 import { createInterface } from 'readline';
@@ -19,6 +28,20 @@ import { createInterface } from 'readline';
 const ONEC_URL = process.env.ONEC_URL || '';
 const ONEC_USER = process.env.ONEC_USER || '';
 const ONEC_PASSWORD = process.env.ONEC_PASSWORD || '';
+
+const ALLOWED_TOOLS_ENV = process.env.ONEC_ALLOWED_TOOLS || '';
+const ALLOWED_TOOLS = ALLOWED_TOOLS_ENV
+  ? new Set(ALLOWED_TOOLS_ENV.split(',').map(s => s.trim()).filter(Boolean))
+  : null;
+
+const DANGEROUS_TOOLS = new Set(['execute_code', 'delete_object', 'run_scheduled_job', 'import_data']);
+
+if (ONEC_URL && ONEC_URL.startsWith('http://') && !ONEC_URL.startsWith('http://localhost') && !ONEC_URL.startsWith('http://127.')) {
+  process.stderr.write(
+    '[INFATON MCP35] WARNING: ONEC_URL uses plain HTTP. ' +
+    'Credentials are transmitted unencrypted. Use HTTPS in production.\n'
+  );
+}
 
 // ─── 51 tool definitions ────────────────────────────────────────────────
 
@@ -143,7 +166,7 @@ const TOOLS = [
   // Group D: Code & Reports (4)
   {
     name: 'execute_code',
-    description: 'Выполнить произвольный код на языке 1С. МОЩНЫЙ ИНСТРУМЕНТ. Код выполняется в привилегированном режиме. Результат должен быть в переменной Результат (строка). Используй когда другие инструменты не подходят.',
+    description: 'Выполнить произвольный код на языке 1С. МОЩНЫЙ ИНСТРУМЕНТ — используй только когда другие инструменты не подходят. Код выполняется в привилегированном режиме на сервере 1С. Результат должен быть в переменной Результат (строка). ВАЖНО: не выполняй операции с файловой системой, внешними соединениями или завершением сеансов без явного подтверждения пользователя.',
     inputSchema: { type: 'object', properties: { code: str('Текст кода на языке 1С') }, required: ['code'] }
   },
   {
@@ -315,10 +338,23 @@ async function handleRequest(msg) {
   }
 
   if (method === 'tools/list') {
-    return { jsonrpc: '2.0', id, result: { tools: TOOLS } };
+    const visibleTools = ALLOWED_TOOLS ? TOOLS.filter(t => ALLOWED_TOOLS.has(t.name)) : TOOLS;
+    return { jsonrpc: '2.0', id, result: { tools: visibleTools } };
   }
 
   if (method === 'tools/call') {
+    const toolName = params && params.name;
+
+    if (ALLOWED_TOOLS && toolName && !ALLOWED_TOOLS.has(toolName)) {
+      return {
+        jsonrpc: '2.0', id,
+        result: {
+          content: [{ type: 'text', text: JSON.stringify({ error: `Tool "${toolName}" is not allowed. Check ONEC_ALLOWED_TOOLS configuration.` }) }],
+          isError: true
+        }
+      };
+    }
+
     if (!ONEC_URL) {
       return {
         jsonrpc: '2.0', id,
@@ -326,7 +362,7 @@ async function handleRequest(msg) {
           content: [{
             type: 'text',
             text: JSON.stringify({
-              error: 'ONEC_URL not configured. Set environment variable ONEC_URL to point to your 1C:Enterprise MCP HTTP service endpoint (e.g., http://server/base/hs/mcp).'
+              error: 'ONEC_URL not configured. Set environment variable ONEC_URL to point to your 1C:Enterprise MCP HTTP service endpoint (e.g., https://server/base/hs/mcp).'
             })
           }],
           isError: true

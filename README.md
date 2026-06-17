@@ -14,9 +14,12 @@
 |------|----------|
 | `Module.bsl` | Модуль HTTP-сервиса MCP — основной код, 51 инструмент (4 263 строки) |
 | `index.mjs` | Node.js stdio-обёртка для MCP-клиентов (Claude Desktop, Cursor и др.) |
+| `package.json` | npm-манифест для публикации и запуска через `npx` |
 | `glama.json` | Манифест для каталога [Glama.ai](https://glama.ai/) |
-| `INFATON_MCP.cfe` | Расширение конфигурации 1С v2.0.0 (бинарный пакет) |
+| `INFATON_MCP.cfe` | Расширение конфигурации 1С v2.1.0 (бинарный пакет) |
 | `HOW_TO_BUILD_CFE.md` | Инструкция по сборке и установке `.cfe` |
+| `EXAMPLES.md` | Примеры агентских сценариев (7 кейсов) |
+| `CHANGELOG.md` | История версий |
 
 ---
 
@@ -152,7 +155,26 @@
 
 ### Вариант 1: Через Claude Desktop / Cursor (stdio)
 
-Добавьте в `claude_desktop_config.json`:
+#### Способ А — через npx (без клонирования)
+
+```json
+{
+  "mcpServers": {
+    "1c-erp": {
+      "command": "npx",
+      "args": ["infaton-mcp"],
+      "env": {
+        "ONEC_URL": "https://your-server/base/hs/mcp/",
+        "ONEC_USER": "Username",
+        "ONEC_PASSWORD": "Password"
+      }
+    }
+  }
+}
+```
+
+#### Способ Б — из клонированного репозитория
+
 ```json
 {
   "mcpServers": {
@@ -263,6 +285,38 @@ curl -u 'Логин:Пароль' -X POST \
 
 ---
 
+## 🔒 Безопасность
+
+### Обязательно для продакшена
+
+| Требование | Почему важно |
+|------------|-------------|
+| **HTTPS** | Basic Auth передаёт логин/пароль в base64. По HTTP они видны любому в сети |
+| **Отдельный пользователь 1С** | Создайте пользователя `mcp_agent` с минимальными правами — только нужные объекты |
+| **`ONEC_ALLOWED_TOOLS`** | Ограничьте список инструментов для конкретного сценария |
+
+### Опасные инструменты
+
+Следующие инструменты требуют явного разрешения и должны использоваться осознанно:
+
+| Инструмент | Риск | Рекомендация |
+|-----------|------|-------------|
+| `execute_code` | Выполняет произвольный BSL-код в привилегированном режиме | Запрещать через `ONEC_ALLOWED_TOOLS` если не нужен |
+| `delete_object` | Помечает объекты на удаление | Запрещать в аналитических сценариях |
+| `run_scheduled_job` | Запускает регламентные задания | Запрещать если не нужен |
+| `import_data` | Массовое создание/изменение объектов | Запрещать в read-only сценариях |
+| `post_document` / `unpost_document` | Изменяет проведение документов и движения по регистрам | Только для операционных сценариев |
+
+### Конфигурация только для чтения
+
+```bash
+ONEC_ALLOWED_TOOLS="get_metadata_tree,execute_query,get_object_by_ref,get_list,find_by_code,find_by_name,get_register_records,get_document_list,get_server_info,get_event_log,get_balance,get_register_totals,get_accounting_entries,get_related_documents,get_form_structure,get_rights,find_duplicates"
+```
+
+Подробнее — см. [EXAMPLES.md](EXAMPLES.md#конфигурация-только-для-чтения-безопасная).
+
+---
+
 ## 📄 Лицензия
 
 MIT © 2024-2026 [INFATON](https://infaton.ru) — Привалов С.Ю.
@@ -270,6 +324,10 @@ MIT © 2024-2026 [INFATON](https://infaton.ru) — Привалов С.Ю.
 ---
 
 *Подробная инструкция по сборке `.cfe` — см. [HOW_TO_BUILD_CFE.md](HOW_TO_BUILD_CFE.md)*
+
+*Примеры агентских сценариев — см. [EXAMPLES.md](EXAMPLES.md)*
+
+*История изменений — см. [CHANGELOG.md](CHANGELOG.md)*
 
 ---
 

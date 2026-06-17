@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  test:
+    name: Smoke test (Node.js ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Verify package.json is valid JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('package.json','utf8')); console.log('package.json OK')"
+
+      - name: Smoke test — initialize
+        run: |
+          echo '{"jsonrpc":"2.0","method":"initialize","id":1}' | node index.mjs | \
+          node -e "
+            const chunks = [];
+            process.stdin.on('data', d => chunks.push(d));
+            process.stdin.on('end', () => {
+              const line = Buffer.concat(chunks).toString().split('\n').find(l => l.trim());
+              const r = JSON.parse(line);
+              if (!r.result || r.result.serverInfo.name !== 'infaton-1c-mcp') {
+                console.error('Unexpected response:', JSON.stringify(r));
+                process.exit(1);
+              }
+              console.log('initialize OK — version', r.result.serverInfo.version);
+            });
+          "
+
+      - name: Smoke test — tools/list returns 51 tools
+        run: |
+          printf '{"jsonrpc":"2.0","method":"initialize","id":1}\n{"jsonrpc":"2.0","method":"tools/list","id":2}\n' | \
+          node index.mjs | \
+          node -e "
+            const chunks = [];
+            process.stdin.on('data', d => chunks.push(d));
+            process.stdin.on('end', () => {
+              const lines = Buffer.concat(chunks).toString().split('\n').filter(l => l.trim());
+              const toolsResp = lines.map(l => JSON.parse(l)).find(r => r.id === 2);
+              const count = toolsResp.result.tools.length;
+              if (count < 51) { console.error('Expected 51 tools, got', count); process.exit(1); }
+              console.log('tools/list OK —', count, 'tools');
+            });
+          "
+
+      - name: Smoke test — ONEC_ALLOWED_TOOLS filter
+        run: |
+          printf '{"jsonrpc":"2.0","method":"initialize","id":1}\n{"jsonrpc":"2.0","method":"tools/list","id":2}\n' | \
+          ONEC_ALLOWED_TOOLS="get_list,execute_query" node index.mjs | \
+          node -e "
+            const chunks = [];
+            process.stdin.on('data', d => chunks.push(d));
+            process.stdin.on('end', () => {
+              const lines = Buffer.concat(chunks).toString().split('\n').filter(l => l.trim());
+              const toolsResp = lines.map(l => JSON.parse(l)).find(r => r.id === 2);
+              const count = toolsResp.result.tools.length;
+              if (count !== 2) { console.error('Expected 2 filtered tools, got', count); process.exit(1); }
+              console.log('ONEC_ALLOWED_TOOLS OK — filtered to', count, 'tools');
+            });
+          "

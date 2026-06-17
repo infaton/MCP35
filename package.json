@@ -1,0 +1,43 @@
+{
+  "name": "infaton-mcp",
+  "version": "2.1.0",
+  "description": "INFATON MCP Server — 51 tools for 1C:Enterprise ERP via Model Context Protocol (JSON-RPC 2.0)",
+  "type": "module",
+  "bin": {
+    "infaton-mcp": "./index.mjs"
+  },
+  "scripts": {
+    "start": "node index.mjs",
+    "test": "node --input-type=module < test/smoke.mjs"
+  },
+  "keywords": [
+    "mcp",
+    "1c",
+    "1c-enterprise",
+    "erp",
+    "json-rpc",
+    "ai-agent",
+    "model-context-protocol",
+    "bsl",
+    "digital-twin"
+  ],
+  "author": "INFATON — Привалов С.Ю. <info@infaton.ru> (https://infaton.ru)",
+  "license": "MIT",
+  "homepage": "https://github.com/infaton/MCP35#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/infaton/MCP35.git"
+  },
+  "bugs": {
+    "url": "https://github.com/infaton/MCP35/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "index.mjs",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ]
+}
