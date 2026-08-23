@@ -2,9 +2,12 @@
 
 [![MCP35 MCP server](https://glama.ai/mcp/servers/infaton/MCP35/badges/card.svg)](https://glama.ai/mcp/servers/infaton/MCP35)
 
-**Model Context Protocol (MCP)** — сервер на стороне 1С:Предприятие, предоставляющий **51 инструмент** для взаимодействия AI-ассистентов с базой данных 1С.
+**Model Context Protocol (MCP)** — сервер на стороне 1С:Предприятие, предоставляющий **91 инструмент** для взаимодействия AI-ассистентов с базой данных 1С.
 
 Протокол: **JSON-RPC 2.0** (спецификация [MCP](https://modelcontextprotocol.io/))
+
+> Часть платформы **INFATON** — цифровые двойники и AI-агенты над 1С:ERP.
+> Компания: **[infaton.ru](https://infaton.ru)** · Продукт: **[mcpchat.ru](https://mcpchat.ru)** (ChatMCP — чат-двойник над вашей 1С:ERP).
 
 ---
 
@@ -12,14 +15,20 @@
 
 | Файл | Описание |
 |------|----------|
-| `Module.bsl` | Модуль HTTP-сервиса MCP — основной код, 51 инструмент (4 263 строки) |
+| `Module.bsl` | Модуль HTTP-сервиса MCP — основной код, 91 инструмент (7 055 строк) |
 | `index.mjs` | Node.js stdio-обёртка для MCP-клиентов (Claude Desktop, Cursor и др.) |
 | `package.json` | npm-манифест для публикации и запуска через `npx` |
 | `glama.json` | Манифест для каталога [Glama.ai](https://glama.ai/) |
-| `INFATON_MCP.cfe` | Расширение конфигурации 1С v2.1.0 (бинарный пакет) |
+| `INFATON_MCP.cfe` | Расширение конфигурации 1С v6.0.2 (бинарный пакет) |
 | `HOW_TO_BUILD_CFE.md` | Инструкция по сборке и установке `.cfe` |
 | `EXAMPLES.md` | Примеры агентских сценариев (7 кейсов) |
 | `CHANGELOG.md` | История версий |
+
+---
+
+## 🆕 Что нового в v6.0.2
+
+**59 → 91 инструмент** (+32): отчёты СКД под типовые конфигурации 1С:ERP (`run_report`, `get_report_options`…), аудит прав (`get_rights_for_user`, `export_role_matrix`), пользовательские настройки (`set_constant`, `set_functional_option`, `set_user_setting`…), снимки и сравнение (`snapshot_document_state`, `compare_snapshots`, `document_chain`), бизнес-данные ЕРП (`get_stock_by_warehouse`, `get_unfulfilled_order_lines`, `get_reservation_status`). Плюс **запись ссылочных полей и перечислений** (резолв `_guid` для шапки И строк табличных частей). Полный перечень — в [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
@@ -56,7 +65,9 @@
 
 ---
 
-## 🛠 Полный каталог: 51 инструмент
+## 🛠 Каталог инструментов
+
+> Ниже — базовый каталог (51 инструмент, группы А–З). В **v6.0.2** добавлены ещё 32 (отчёты/СКД, права, пользовательские настройки, снимки, бизнес-данные 1С:ERP) — полный список из **91** в `Module.bsl` и [CHANGELOG.md](CHANGELOG.md).
 
 ### Группа А — Метаданные (8)
 
@@ -320,6 +331,8 @@ ONEC_ALLOWED_TOOLS="get_metadata_tree,execute_query,get_object_by_ref,get_list,f
 ## 📄 Лицензия
 
 MIT © 2024-2026 [INFATON](https://infaton.ru) — Привалов С.Ю.
+
+Платформа: **[infaton.ru](https://infaton.ru)** · Продукт: **[mcpchat.ru](https://mcpchat.ru)** (ChatMCP).
 
 ---
 

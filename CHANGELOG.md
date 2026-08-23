@@ -6,6 +6,29 @@
 
 ---
 
+## [6.0.2] — 2026-07-29
+
+Крупное обновление: **59 → 91 инструмент** (+32). Запись ссылочных полей и перечислений, отчёты СКД под типовые конфигурации 1С:ERP, аудит прав, снимки состояния и сравнение метаданных.
+
+> Часть платформы **INFATON** — цифровые двойники и AI-агенты над 1С:ERP.
+> Компания: [infaton.ru](https://infaton.ru) · Продукт: [mcpchat.ru](https://mcpchat.ru) (ChatMCP — чат-двойник над вашей 1С:ERP).
+
+### Добавлено (32 инструмента)
+- **Отчёты и вызовы (СКД):** `run_report`, `get_report_options`, `save_report_variant`, `list_data_processors`, `run_data_processor`, `call_object_method`, `call_function`, `top_register`
+- **Права и аудит:** `get_rights_for_user`, `assign_role_to_user`, `export_role_matrix`
+- **Пользовательские настройки:** `set_user_setting`, `set_constant`, `set_functional_option`, `get_functional_option_map`, `load_extension`, `delete_extension`
+- **Расширения и модули:** `get_extension_modules`, `get_form_module_text`, `compare_metadata_to_extension`, `get_subscription_handlers`
+- **Снимки и цепочки:** `snapshot_document_state`, `compare_snapshots`, `document_chain`, `simulate_fill_on_basis`, `get_document_commands`
+- **Регламент/обмен:** `get_scheduled_jobs`, `get_exchange_plans`
+- **Бизнес-данные 1С:ERP:** `get_stock_by_warehouse`, `get_reservation_status`, `get_unfulfilled_order_lines`, `get_business_process_tasks`
+
+### Изменено / исправлено
+- **Запись ссылочных полей и перечислений:** резолв `_guid` работает для ссылок ШАПКИ и строк ТАБЛИЧНЫХ ЧАСТЕЙ (раньше ссылка строки ТЧ тихо терялась); `set_attribute` на реквизит-перечисление принимает значение по имени/синониму; ошибки записи больше не глушатся молча.
+- **run_report:** нормализация выражений параметров схемы (через `Вычислить()`) и внешние функции СКД — типовые отчёты ЕРП (продажи/выручка/рентабельность) больше не падают.
+- Статанализ bsl-language-server: `ТекущаяДата()` → `ТекущаяДатаСеанса()` (снят DeprecatedCurrentDate).
+
+---
+
 ## [2.1.0] — 2026-05-14
 
 ### Добавлено

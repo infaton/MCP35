@@ -1,7 +1,7 @@
 {
   "name": "infaton-mcp",
-  "version": "2.1.0",
-  "description": "INFATON MCP Server — 51 tools for 1C:Enterprise ERP via Model Context Protocol (JSON-RPC 2.0)",
+  "version": "6.0.2",
+  "description": "INFATON MCP Server — 91 tools for 1C:Enterprise ERP via Model Context Protocol (JSON-RPC 2.0). Digital twins & AI agents over 1C:ERP (infaton.ru, mcpchat.ru).",
   "type": "module",
   "bin": {
     "infaton-mcp": "./index.mjs"
