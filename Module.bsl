@@ -8,7 +8,7 @@
 //
 // Часть платформы INFATON — цифровые двойники и AI-агенты над 1С:ERP.
 //   Компания:    https://infaton.ru
-//   Продукт:     https://mcpchat.ru   (ChatMCP — чат-двойник над вашей 1С:ERP)
+//   Продукт:     https://chatmcp.ru   (ChatMCP — чат-двойник над вашей 1С:ERP)
 //   Репозиторий: https://github.com/infaton/MCP35
 //
 // © 2024-2026 INFATON — Привалов С.Ю.   ·   Лицензия: MIT

@@ -11,7 +11,7 @@
 Крупное обновление: **59 → 91 инструмент** (+32). Запись ссылочных полей и перечислений, отчёты СКД под типовые конфигурации 1С:ERP, аудит прав, снимки состояния и сравнение метаданных.
 
 > Часть платформы **INFATON** — цифровые двойники и AI-агенты над 1С:ERP.
-> Компания: [infaton.ru](https://infaton.ru) · Продукт: [mcpchat.ru](https://mcpchat.ru) (ChatMCP — чат-двойник над вашей 1С:ERP).
+> Компания: [infaton.ru](https://infaton.ru) · Продукт: [chatmcp.ru](https://chatmcp.ru) (ChatMCP — чат-двойник над вашей 1С:ERP).
 
 ### Добавлено (32 инструмента)
 - **Отчёты и вызовы (СКД):** `run_report`, `get_report_options`, `save_report_variant`, `list_data_processors`, `run_data_processor`, `call_object_method`, `call_function`, `top_register`

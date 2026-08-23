@@ -7,7 +7,7 @@
 Протокол: **JSON-RPC 2.0** (спецификация [MCP](https://modelcontextprotocol.io/))
 
 > Часть платформы **INFATON** — цифровые двойники и AI-агенты над 1С:ERP.
-> Компания: **[infaton.ru](https://infaton.ru)** · Продукт: **[mcpchat.ru](https://mcpchat.ru)** (ChatMCP — чат-двойник над вашей 1С:ERP).
+> Компания: **[infaton.ru](https://infaton.ru)** · Продукт: **[chatmcp.ru](https://chatmcp.ru)** (ChatMCP — чат-двойник над вашей 1С:ERP).
 
 ---
 
@@ -343,7 +343,7 @@ ONEC_ALLOWED_TOOLS="get_metadata_tree,execute_query,get_object_by_ref,get_list,f
 
 MIT © 2024-2026 [INFATON](https://infaton.ru) — Привалов С.Ю.
 
-Платформа: **[infaton.ru](https://infaton.ru)** · Продукт: **[mcpchat.ru](https://mcpchat.ru)** (ChatMCP).
+Платформа: **[infaton.ru](https://infaton.ru)** · Продукт: **[chatmcp.ru](https://chatmcp.ru)** (ChatMCP).
 
 ---
 
