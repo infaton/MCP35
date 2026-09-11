@@ -30,7 +30,7 @@ INFATON MCP Server — движок доступа AI к 1С в продукта
 | `index.mjs` | Node.js stdio-обёртка для MCP-клиентов (Claude Desktop, Cursor и др.) |
 | `package.json` | npm-манифест для публикации и запуска через `npx` |
 | `glama.json` | Манифест для каталога [Glama.ai](https://glama.ai/) |
-| `INFATON_MCP.cfe` | Расширение конфигурации 1С (бинарный пакет). Исходник — `Module.bsl` **v6.2.1**; пересборка `.cfe` — см. `HOW_TO_BUILD_CFE.md` |
+| `INFATON_MCP.cfe` | Расширение конфигурации 1С **v6.2.1** (бинарный пакет) |
 | `HOW_TO_BUILD_CFE.md` | Инструкция по сборке и установке `.cfe` |
 | `EXAMPLES.md` | Примеры агентских сценариев (7 кейсов) |
 | `CHANGELOG.md` | История версий |
