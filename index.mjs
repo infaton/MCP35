@@ -328,7 +328,7 @@ async function handleRequest(msg) {
       result: {
         protocolVersion: '2024-11-05',
         capabilities: { tools: {} },
-        serverInfo: { name: 'infaton-1c-mcp', version: '2.1.0' }
+        serverInfo: { name: 'infaton-1c-mcp', version: '6.2.1' }
       }
     };
   }

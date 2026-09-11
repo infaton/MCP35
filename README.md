@@ -30,12 +30,18 @@ INFATON MCP Server — движок доступа AI к 1С в продукта
 | `index.mjs` | Node.js stdio-обёртка для MCP-клиентов (Claude Desktop, Cursor и др.) |
 | `package.json` | npm-манифест для публикации и запуска через `npx` |
 | `glama.json` | Манифест для каталога [Glama.ai](https://glama.ai/) |
-| `INFATON_MCP.cfe` | Расширение конфигурации 1С v6.0.2 (бинарный пакет) |
+| `INFATON_MCP.cfe` | Расширение конфигурации 1С (бинарный пакет). Исходник — `Module.bsl` **v6.2.1**; пересборка `.cfe` — см. `HOW_TO_BUILD_CFE.md` |
 | `HOW_TO_BUILD_CFE.md` | Инструкция по сборке и установке `.cfe` |
 | `EXAMPLES.md` | Примеры агентских сценариев (7 кейсов) |
 | `CHANGELOG.md` | История версий |
 
 ---
+
+## 🆕 Что нового в v6.2.1
+
+- **Безопасная запись составных ссылок по GUID** (6.2.1): объект проверяется в каждом разрешённом типе, несуществующий GUID отклоняется.
+- **`fill_counterparty_by_inn`** (6.2.0): реквизиты контрагента по ИНН штатным 1С:Контрагент (чтение, без записи).
+- **`get_config_fingerprint`** (6.1.0): дешёвый отпечаток состава конфигурации.
 
 ## 🆕 Что нового в v6.0.2
 
@@ -239,7 +245,7 @@ curl -u 'Логин:Пароль' -X POST \
   "result": {
     "protocolVersion": "2024-11-05",
     "capabilities": { "tools": {} },
-    "serverInfo": { "name": "infaton-1c-mcp", "version": "2.1.0" }
+    "serverInfo": { "name": "infaton-1c-mcp", "version": "6.2.1" }
   }
 }
 ```
