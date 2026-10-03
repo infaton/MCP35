@@ -43,7 +43,7 @@ if (ONEC_URL && ONEC_URL.startsWith('http://') && !ONEC_URL.startsWith('http://l
   );
 }
 
-// ─── 51 tool definitions ────────────────────────────────────────────────
+// ─── Offline inspection: 51 legacy tool definitions ────────────────────────────────────────────────
 
 function str(description) {
   return { type: 'string', description };
@@ -328,7 +328,7 @@ async function handleRequest(msg) {
       result: {
         protocolVersion: '2024-11-05',
         capabilities: { tools: {} },
-        serverInfo: { name: 'infaton-1c-mcp', version: '6.2.1' }
+        serverInfo: { name: 'infaton-1c-mcp', version: '6.2.5' }
       }
     };
   }
@@ -338,7 +338,34 @@ async function handleRequest(msg) {
   }
 
   if (method === 'tools/list') {
-    const visibleTools = ALLOWED_TOOLS ? TOOLS.filter(t => ALLOWED_TOOLS.has(t.name)) : TOOLS;
+    // The installed 1C service owns the catalog. A fixed list hides new tools
+    // and can advertise operations absent from the actual extension.
+    let catalog = TOOLS;
+    if (ONEC_URL) {
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (ONEC_USER) {
+          headers.Authorization = 'Basic ' + Buffer.from(`${ONEC_USER}:${ONEC_PASSWORD}`).toString('base64');
+        }
+        const response = await fetch(ONEC_URL, {
+          method: 'POST', headers,
+          body: JSON.stringify({ jsonrpc: '2.0', id, method: 'tools/list', params }),
+          signal: AbortSignal.timeout(15000)
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        if (data.error || !Array.isArray(data.result?.tools) ||
+            !data.result.tools.every(t => t && typeof t.name === 'string' && t.inputSchema?.type === 'object')) {
+          throw new Error('Invalid tools/list response');
+        }
+        catalog = data.result.tools;
+      } catch {
+        // Never present the offline catalog as a successful live discovery.
+        return { jsonrpc: '2.0', id, error: { code: -32000,
+          message: 'Cannot load tools from the configured 1C service. Check connectivity, credentials and extension version.' } };
+      }
+    }
+    const visibleTools = ALLOWED_TOOLS ? catalog.filter(t => ALLOWED_TOOLS.has(t.name)) : catalog;
     return { jsonrpc: '2.0', id, result: { tools: visibleTools } };
   }
 
