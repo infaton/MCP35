@@ -15,9 +15,9 @@ for (const dispatcher of ['ОбработатьВызовИнструмента'
   for(const name of names.filter(n => dispatcher !== 'ВыполнитьИнструментПоИмени' || n !== 'execute_batch')) assert(body.includes('ИмяИнструмента = "'+name+'"'),dispatcher+': '+name);
 }
 const pkg=JSON.parse(readFileSync(new URL('package.json',root),'utf8'));
-assert.equal(pkg.version,'6.2.5');
-assert(source.includes('Инфо.Вставить("version", "6.2.5")'));
-assert(source.includes('Инфо.Вставить("mcp_server_version", "6.2.5")'));
+assert.equal(pkg.version,'6.2.8');
+assert(source.includes('Инфо.Вставить("version", "6.2.8")'));
+assert(source.includes('Инфо.Вставить("mcp_server_version", "6.2.8")'));
 
 async function rpc(messages,config={}) {
   const env={...process.env};
@@ -31,7 +31,7 @@ async function rpc(messages,config={}) {
   return out.trim().split('\n').filter(Boolean).map(l=>JSON.parse(l));
 }
 const offline=await rpc([{id:1,method:'initialize'},{id:2,method:'tools/list'},{id:3,method:'tools/call',params:{name:'get_list'}}]);
-assert.equal(offline.find(x=>x.id===1).result.serverInfo.version,'6.2.5');
+assert.equal(offline.find(x=>x.id===1).result.serverInfo.version,'6.2.8');
 assert.equal(offline.find(x=>x.id===2).result.tools.length,51);
 assert.equal(offline.find(x=>x.id===3).result.isError,true);
 const requests=[];
@@ -66,4 +66,4 @@ try{
     assert.equal(r.error.code,-32000);assert.equal(r.result,undefined);
   }
 }finally{server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
-console.log('PASS: 94 unique BSL registrations; dispatch coverage with nested batch excluded; 6.2.5 versions; offline mode; live catalog; filter; blocked calls; proxy arguments; discovery failure without fallback. BSL runtime not tested.');
+console.log('PASS: 94 unique BSL registrations; dispatch coverage with nested batch excluded; 6.2.8 versions; offline mode; live catalog; filter; blocked calls; proxy arguments; discovery failure without fallback. BSL runtime not tested.');
